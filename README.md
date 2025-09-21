@@ -7,7 +7,7 @@ An AI-powered SDR system for intelligent lead qualification, personalized outrea
 ### Option 1: Docker (Recommended)
 ```bash
 # Clone the repository
-git clone <your-repo-url>
+git clone https://github.com/meghna-sk/ai-sdr
 cd eng_sales_sdr
 
 # Create environment file
