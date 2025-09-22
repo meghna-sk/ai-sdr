@@ -32,7 +32,7 @@ app.add_middleware(
     allow_origins=[
         "http://localhost:3000", 
         "http://localhost:5173",
-        "https://ai-sdr-frontend-acds.onrender.com",
+        "https://ai-sdr-frontend-server.onrender.com",
         "https://ai-sdr-k9ml.onrender.com"
     ],
     allow_credentials=True,
