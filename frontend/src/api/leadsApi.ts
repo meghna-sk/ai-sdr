@@ -22,6 +22,7 @@ async function apiRequest<T>(endpoint: string, options?: RequestInit): Promise<T
       ...options,
     })
 
+    console.log('RESPONSE', response)
     if (!response.ok) {
       throw new ApiError(response.status, `HTTP ${response.status}: ${response.statusText}`)
     }
