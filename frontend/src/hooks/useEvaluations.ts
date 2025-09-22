@@ -36,7 +36,7 @@ interface RunEvaluationRequest {
   include_leads?: string[]
 }
 
-const API_BASE_URL = 'http://localhost:8000'
+const API_BASE_URL = 'https://ai-sdr-k9ml.onrender.com'
 
 // Fetch all evaluations
 const fetchEvaluations = async (): Promise<EvaluationRun[]> => {
