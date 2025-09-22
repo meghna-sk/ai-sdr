@@ -2,12 +2,6 @@ import { Lead, ActivitiesResponse } from '../types'
 
 const API_BASE_URL = 'https://ai-sdr-k9ml.onrender.com'
 
-// Debug logging
-console.log('=== API DEBUG ===')
-console.log('API_BASE_URL:', API_BASE_URL)
-console.log('Current URL:', window.location.href)
-console.log('==================')
-
 export class ApiError extends Error {
   constructor(public status: number, message: string) {
     super(message)
@@ -17,13 +11,6 @@ export class ApiError extends Error {
 
 async function apiRequest<T>(endpoint: string, options?: RequestInit): Promise<T> {
   const url = `${API_BASE_URL}${endpoint}`
-  
-  // More detailed debug logging
-  console.log('=== API REQUEST DEBUG ===')
-  console.log('API_BASE_URL:', API_BASE_URL)
-  console.log('endpoint:', endpoint)
-  console.log('Full URL:', url)
-  console.log('========================')
   
   try {
     const response = await fetch(url, {
