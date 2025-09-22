@@ -13,6 +13,10 @@ RUN npm ci
 # Copy source code
 COPY . .
 
+# Set default environment variable for API URL
+ARG VITE_API_URL=https://ai-sdr-k9ml.onrender.com
+ENV VITE_API_URL=$VITE_API_URL
+
 # Build the application
 RUN npm run build
 

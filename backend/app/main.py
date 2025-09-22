@@ -29,7 +29,11 @@ app.include_router(meetings.router)
 # Configure CORS
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173"],
+    allow_origins=[
+        "http://localhost:5173",  # Vite dev server
+        "https://ai-sdr-frontend-acds.onrender.com",  # Render frontend
+        "https://ai-sdr-k9ml.onrender.com",  # Alternative frontend URL
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
