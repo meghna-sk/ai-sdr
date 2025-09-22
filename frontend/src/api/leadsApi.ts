@@ -2,6 +2,12 @@ import { Lead, ActivitiesResponse } from '../types'
 
 const API_BASE_URL = 'https://ai-sdr-k9ml.onrender.com'
 
+// Debug logging
+console.log('=== API DEBUG ===')
+console.log('API_BASE_URL:', API_BASE_URL)
+console.log('Current URL:', window.location.href)
+console.log('==================')
+
 export class ApiError extends Error {
   constructor(public status: number, message: string) {
     super(message)
