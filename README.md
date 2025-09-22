@@ -2,67 +2,43 @@
 
 An AI-powered SDR system for intelligent lead qualification, personalized outreach, and meeting coordination.
 
-## 🚀 Quick Start
+## 🚀 Quick Start (Localhost Only)
 
-### Option 1: Docker (Recommended)
+### Prerequisites
+- Python 3.11+
+- Node.js 18+
+- XAI API Key
+
+### Manual Setup
 ```bash
 # Clone the repository
 git clone <your-repo-url>
-cd eng_sales_sdr
+cd ai-sdr
 
 # Create environment file
 cp env.example .env
 # Edit .env and add your XAI_API_KEY
 
-# Run with Docker Compose
-docker-compose up --build
-
-# Access the application
-# Frontend: http://localhost:3000
-# Backend: http://localhost:8000
-```
-
-### Option 2: Local Development
-```bash
 # Backend Setup
 cd backend
 python -m venv .venv
-# Windows
+# Windows:
 .venv\Scripts\activate
-# macOS/Linux
+# macOS/Linux:
 source .venv/bin/activate
-
 pip install -r requirements.txt
 uvicorn app.main:app --reload --port 8000
 
-# Frontend Setup (in new terminal)
+# Frontend Setup (New Terminal)
 cd frontend
 npm install
 npm run dev -- --port 5173
 ```
 
-## 🌐 Free Deployment
-
-### Render (100% Free)
-1. Push your code to GitHub
-2. Go to [render.com](https://render.com)
-3. Sign up with GitHub (no credit card required)
-4. Deploy backend:
-   - Create new "Web Service"
-   - Connect GitHub repo
-   - Root Directory: `backend`
-   - Add environment variable: `XAI_API_KEY=your_key`
-5. Deploy frontend:
-   - Create new "Web Service"
-   - Connect same repo
-   - Root Directory: `frontend`
-   - Add environment variable: `VITE_API_BASE_URL=https://your-backend-url.onrender.com`
-
-### Vercel + Railway (Also Free)
-- Frontend on Vercel (free)
-- Backend on Railway (free trial with $5 credit)
-
-See [FREE_DEPLOYMENT.md](FREE_DEPLOYMENT.md) for detailed instructions.
+### Access the Application
+- **Frontend:** http://localhost:5173
+- **Backend API:** http://localhost:8000
+- **API Documentation:** http://localhost:8000/docs
 
 ## 📋 Features
 
@@ -109,7 +85,7 @@ See [FREE_DEPLOYMENT.md](FREE_DEPLOYMENT.md) for detailed instructions.
 Create a `.env` file in the root directory:
 ```bash
 XAI_API_KEY=your_xai_api_key_here
-DATABASE_URL=sqlite:///./app.db
+DATABASE_URL=sqlite:///./backend/leads.db
 ```
 
 ## 🗄️ Database

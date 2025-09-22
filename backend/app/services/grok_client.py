@@ -49,9 +49,9 @@ class GrokClient:
         try:
             print("=== GrokClient.__init__ starting ===")
             
-            # Load .env file from backend directory (two levels up from services)
-            backend_dir = Path(__file__).parent.parent.parent
-            dotenv_path = backend_dir / ".env"
+            # Load .env file from project root directory (three levels up from services)
+            project_root = Path(__file__).parent.parent.parent.parent
+            dotenv_path = project_root / ".env"
             
             
             dotenv.load_dotenv(dotenv_path=dotenv_path)

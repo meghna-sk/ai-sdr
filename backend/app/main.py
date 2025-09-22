@@ -31,9 +31,7 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=[
         "http://localhost:3000", 
-        "http://localhost:5173",
-        "https://ai-sdr-frontend-server.onrender.com",
-        "https://ai-sdr-k9ml.onrender.com"
+        "http://localhost:5173"
     ],
     allow_credentials=True,
     allow_methods=["*"],
