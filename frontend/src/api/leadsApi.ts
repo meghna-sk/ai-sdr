@@ -1,6 +1,7 @@
 import { Lead, ActivitiesResponse } from '../types'
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://ai-sdr-k9ml.onrender.com'
+// Force HTTPS URL construction
+const API_BASE_URL = 'https://ai-sdr-k9ml.onrender.com'
 
 export class ApiError extends Error {
   constructor(public status: number, message: string) {
@@ -10,13 +11,14 @@ export class ApiError extends Error {
 }
 
 async function apiRequest<T>(endpoint: string, options?: RequestInit): Promise<T> {
-  const url = `${API_BASE_URL}${endpoint}`
+  // Completely hardcoded URL construction to avoid any string interpolation issues
+  const url = 'https://ai-sdr-k9ml.onrender.com' + endpoint
 
   // Force HTTPS and log everything
   console.log('=== NETWORK DEBUG ===')
   console.log('API_BASE_URL:', API_BASE_URL)
   console.log('endpoint:', endpoint)
-  console.log('Original URL:', url)
+  console.log('Hardcoded URL:', url)
   console.log('URL protocol:', new URL(url).protocol)
   console.log('URL hostname:', new URL(url).hostname)
   console.log('URL pathname:', new URL(url).pathname)
@@ -26,16 +28,9 @@ async function apiRequest<T>(endpoint: string, options?: RequestInit): Promise<T
   console.log('========================')
 
   try {
-    console.log('Attempting fetch with explicit HTTPS enforcement to:', url)
+    console.log('Attempting fetch with hardcoded URL:', url)
     
-    // Force HTTPS by reconstructing the URL
-    const urlObj = new URL(url)
-    urlObj.protocol = 'https:'
-    const httpsUrl = urlObj.toString()
-    
-    console.log('Reconstructed HTTPS URL:', httpsUrl)
-    
-    const response = await fetch(httpsUrl, {
+    const response = await fetch(url, {
       headers: {
         'Content-Type': 'application/json',
         ...options?.headers,
