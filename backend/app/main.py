@@ -33,9 +33,10 @@ app.add_middleware(
         "http://localhost:5173",  # Vite dev server
         "https://ai-sdr-frontend-acds.onrender.com",  # Render frontend
         "https://ai-sdr-k9ml.onrender.com",  # Alternative frontend URL
+        "http://ai-sdr-k9ml.onrender.com",  # HTTP version (in case of redirects)
     ],
     allow_credentials=True,
-    allow_methods=["*"],
+    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allow_headers=["*"],
 )
 

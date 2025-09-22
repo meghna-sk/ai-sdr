@@ -11,38 +11,102 @@ export class ApiError extends Error {
 }
 
 async function apiRequest<T>(endpoint: string, options?: RequestInit): Promise<T> {
-  // Completely hardcoded URL construction to avoid any string interpolation issues
-  const url = 'https://ai-sdr-k9ml.onrender.com' + endpoint
+  // Try using a different URL construction method
+  const baseUrl = 'https://ai-sdr-k9ml.onrender.com'
+  const fullUrl = baseUrl + endpoint
 
   // Force HTTPS and log everything
   console.log('=== NETWORK DEBUG ===')
-  console.log('API_BASE_URL:', API_BASE_URL)
-  console.log('endpoint:', endpoint)
-  console.log('Hardcoded URL:', url)
-  console.log('URL protocol:', new URL(url).protocol)
-  console.log('URL hostname:', new URL(url).hostname)
-  console.log('URL pathname:', new URL(url).pathname)
+  console.log('Base URL:', baseUrl)
+  console.log('Endpoint:', endpoint)
+  console.log('Full URL:', fullUrl)
+  console.log('URL protocol:', new URL(fullUrl).protocol)
+  console.log('URL hostname:', new URL(fullUrl).hostname)
+  console.log('URL pathname:', new URL(fullUrl).pathname)
   console.log('Service Worker active:', navigator.serviceWorker?.controller ? 'YES' : 'NO')
   console.log('User Agent:', navigator.userAgent)
   console.log('Location:', window.location.href)
   console.log('========================')
 
   try {
-    console.log('Attempting fetch with hardcoded URL:', url)
+    console.log('Attempting fetch with reconstructed URL:', fullUrl)
     
-    const response = await fetch(url, {
-      headers: {
-        'Content-Type': 'application/json',
-        ...options?.headers,
-      },
-      ...options,
-    })
+    // Try fetch first
+    try {
+      const response = await fetch(fullUrl, {
+        headers: {
+          'Content-Type': 'application/json',
+          ...options?.headers,
+        },
+        ...options,
+      })
 
-    if (!response.ok) {
-      throw new ApiError(response.status, `HTTP ${response.status}: ${response.statusText}`)
+      if (!response.ok) {
+        throw new ApiError(response.status, `HTTP ${response.status}: ${response.statusText}`)
+      }
+
+      return await response.json()
+    } catch (fetchError) {
+      console.log('Fetch failed, trying XMLHttpRequest fallback')
+      
+      // Fallback to XMLHttpRequest
+      return new Promise<T>((resolve, reject) => {
+        const xhr = new XMLHttpRequest()
+        
+        xhr.open(options?.method || 'GET', fullUrl, true)
+        xhr.setRequestHeader('Content-Type', 'application/json')
+        
+        // Set additional headers
+        if (options?.headers) {
+          Object.entries(options.headers).forEach(([key, value]) => {
+            if (typeof value === 'string') {
+              xhr.setRequestHeader(key, value)
+            }
+          })
+        }
+        
+        xhr.onload = () => {
+          if (xhr.status >= 200 && xhr.status < 300) {
+            try {
+              const data = JSON.parse(xhr.responseText)
+              resolve(data)
+            } catch (parseError) {
+              reject(new ApiError(0, 'Invalid JSON response'))
+            }
+          } else {
+            reject(new ApiError(xhr.status, `HTTP ${xhr.status}: ${xhr.statusText}`))
+          }
+        }
+        
+        xhr.onerror = () => {
+          reject(new ApiError(0, 'Network error'))
+        }
+        
+        xhr.ontimeout = () => {
+          reject(new ApiError(0, 'Request timeout'))
+        }
+        
+        xhr.timeout = 10000 // 10 second timeout
+        
+        if (options?.body) {
+          // Handle different body types for XMLHttpRequest
+          if (typeof options.body === 'string') {
+            xhr.send(options.body)
+          } else if (options.body instanceof FormData) {
+            xhr.send(options.body)
+          } else if (options.body instanceof Blob) {
+            xhr.send(options.body)
+          } else if (options.body instanceof ArrayBuffer) {
+            xhr.send(options.body)
+          } else {
+            // For ReadableStream and other types, convert to string
+            xhr.send(String(options.body))
+          }
+        } else {
+          xhr.send()
+        }
+      })
     }
-
-    return await response.json()
   } catch (error) {
     if (error instanceof ApiError) {
       throw error
@@ -55,12 +119,12 @@ async function apiRequest<T>(endpoint: string, options?: RequestInit): Promise<T
 export const leadsApi = {
   // Get all leads
   async getLeads(): Promise<Lead[]> {
-    return apiRequest<Lead[]>('/api/leads')
+    return apiRequest<Lead[]>('/api/leads/')
   },
 
   // Create a new lead
   async createLead(lead: Omit<Lead, 'id' | 'created_at' | 'updated_at' | 'score' | 'company_profile_id'>): Promise<Lead> {
-    return apiRequest<Lead>('/api/leads', {
+    return apiRequest<Lead>('/api/leads/', {
       method: 'POST',
       body: JSON.stringify(lead),
     })
@@ -68,7 +132,7 @@ export const leadsApi = {
 
   // Update a lead
   async updateLead(id: number, updates: Partial<Lead>): Promise<Lead> {
-    return apiRequest<Lead>(`/api/leads/${id}`, {
+    return apiRequest<Lead>(`/api/leads/${id}/`, {
       method: 'PUT',
       body: JSON.stringify(updates),
     })
@@ -76,7 +140,7 @@ export const leadsApi = {
 
   // Delete a lead
   async deleteLead(id: number): Promise<void> {
-    await apiRequest<void>(`/api/leads/${id}`, {
+    await apiRequest<void>(`/api/leads/${id}/`, {
       method: 'DELETE',
     })
   },
@@ -86,7 +150,7 @@ export const leadsApi = {
     const formData = new FormData()
     formData.append('file', file)
 
-    return apiRequest<{ message: string; imported_count: number; failed_count: number }>('/api/leads/import', {
+    return apiRequest<{ message: string; imported_count: number; failed_count: number }>('/api/leads/import/', {
       method: 'POST',
       body: formData,
       headers: {}, // Let browser set Content-Type for FormData
@@ -95,7 +159,7 @@ export const leadsApi = {
 
   // Seed database with sample leads
   async seedLeads(): Promise<{ message: string; total_leads: number }> {
-    return apiRequest<{ message: string; total_leads: number }>('/api/leads/seed', {
+    return apiRequest<{ message: string; total_leads: number }>('/api/leads/seed/', {
       method: 'POST',
     })
   },
@@ -105,7 +169,7 @@ export const leadsApi = {
     limit?: number
     offset?: number
   }): Promise<ActivitiesResponse> {
-    const url = new URL(`${API_BASE_URL}/api/leads/${leadId}/activities`)
+    const url = new URL(`${API_BASE_URL}/api/leads/${leadId}/activities/`)
     
     if (params?.type) {
       url.searchParams.append('type', params.type)
