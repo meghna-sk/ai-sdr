@@ -12,7 +12,18 @@ export class ApiError extends Error {
 async function apiRequest<T>(endpoint: string, options?: RequestInit): Promise<T> {
   const url = `${API_BASE_URL}${endpoint}`
   
+  // Force HTTPS and log everything
+  console.log('=== NETWORK DEBUG ===')
+  console.log('Original URL:', url)
+  console.log('URL protocol:', new URL(url).protocol)
+  console.log('URL hostname:', new URL(url).hostname)
+  console.log('Service Worker active:', navigator.serviceWorker?.controller ? 'YES' : 'NO')
+  console.log('========================')
+  
   try {
+    // Try XMLHttpRequest as alternative to fetch
+    console.log('Attempting fetch request to:', url)
+    
     const response = await fetch(url, {
       headers: {
         'Content-Type': 'application/json',
