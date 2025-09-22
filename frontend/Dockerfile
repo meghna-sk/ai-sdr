@@ -14,8 +14,8 @@ RUN npm ci
 COPY . .
 
 # Set default environment variable for API URL
-ARG VITE_API_URL=https://ai-sdr-k9ml.onrender.com
-ENV VITE_API_URL=$VITE_API_URL
+ARG VITE_API_BASE_URL=https://ai-sdr-k9ml.onrender.com
+ENV VITE_API_BASE_URL=$VITE_API_BASE_URL
 
 # Build the application
 RUN npm run build
@@ -26,8 +26,8 @@ FROM node:18-alpine AS production
 # Set working directory
 WORKDIR /app
 
-# Install serve globally
-RUN npm install -g serve
+# Install serve globally and wget for health check
+RUN npm install -g serve && apk add --no-cache wget
 
 # Copy built application from builder stage
 COPY --from=builder /app/dist ./dist

@@ -11,7 +11,7 @@ export class ApiError extends Error {
 
 async function apiRequest<T>(endpoint: string, options?: RequestInit): Promise<T> {
   const url = `${API_BASE_URL}${endpoint}`
-  
+
   // Force HTTPS and log everything
   console.log('=== NETWORK DEBUG ===')
   console.log('API_BASE_URL:', API_BASE_URL)
@@ -21,25 +21,58 @@ async function apiRequest<T>(endpoint: string, options?: RequestInit): Promise<T
   console.log('URL hostname:', new URL(url).hostname)
   console.log('URL pathname:', new URL(url).pathname)
   console.log('Service Worker active:', navigator.serviceWorker?.controller ? 'YES' : 'NO')
+  console.log('User Agent:', navigator.userAgent)
+  console.log('Location:', window.location.href)
   console.log('========================')
-  
+
   try {
-    // Try XMLHttpRequest as alternative to fetch
-    console.log('Attempting fetch request to:', url)
+    console.log('Attempting XMLHttpRequest to:', url)
     
-    const response = await fetch(url, {
-      headers: {
-        'Content-Type': 'application/json',
-        ...options?.headers,
-      },
-      ...options,
+    // Use XMLHttpRequest instead of fetch to bypass any potential interception
+    return new Promise<T>((resolve, reject) => {
+      const xhr = new XMLHttpRequest()
+      
+      xhr.open(options?.method || 'GET', url, true)
+      xhr.setRequestHeader('Content-Type', 'application/json')
+      
+      // Set additional headers
+      if (options?.headers) {
+        Object.entries(options.headers).forEach(([key, value]) => {
+          if (typeof value === 'string') {
+            xhr.setRequestHeader(key, value)
+          }
+        })
+      }
+      
+      xhr.onload = () => {
+        if (xhr.status >= 200 && xhr.status < 300) {
+          try {
+            const data = JSON.parse(xhr.responseText)
+            resolve(data)
+          } catch (parseError) {
+            reject(new ApiError(0, 'Invalid JSON response'))
+          }
+        } else {
+          reject(new ApiError(xhr.status, `HTTP ${xhr.status}: ${xhr.statusText}`))
+        }
+      }
+      
+      xhr.onerror = () => {
+        reject(new ApiError(0, 'Network error'))
+      }
+      
+      xhr.ontimeout = () => {
+        reject(new ApiError(0, 'Request timeout'))
+      }
+      
+      xhr.timeout = 10000 // 10 second timeout
+      
+      if (options?.body) {
+        xhr.send(options.body)
+      } else {
+        xhr.send()
+      }
     })
-
-    if (!response.ok) {
-      throw new ApiError(response.status, `HTTP ${response.status}: ${response.statusText}`)
-    }
-
-    return await response.json()
   } catch (error) {
     if (error instanceof ApiError) {
       throw error
