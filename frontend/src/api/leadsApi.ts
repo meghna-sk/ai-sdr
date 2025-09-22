@@ -2,18 +2,27 @@ import { Lead, ActivitiesResponse } from '../types'
 
 // Determine API base URL based on environment
 const getApiBaseUrl = () => {
+  let baseUrl = ''
+  
   // First priority: Check for environment variable (this should work in Render)
   if (import.meta.env.VITE_API_BASE_URL) {
-    return import.meta.env.VITE_API_BASE_URL
+    baseUrl = import.meta.env.VITE_API_BASE_URL
   }
-  
   // Fallback: Check if we're in production (deployed on Render)
-  if (window.location.hostname.includes('onrender.com')) {
-    return 'https://ai-sdr-k9ml.onrender.com'
+  else if (window.location.hostname.includes('onrender.com')) {
+    baseUrl = 'https://ai-sdr-k9ml.onrender.com'
+  }
+  // Default to localhost for local development
+  else {
+    baseUrl = 'http://localhost:8000'
   }
   
-  // Default to localhost for local development
-  return 'http://localhost:8000'
+  // Ensure HTTPS is used in production (fix mixed content issues)
+  if (window.location.protocol === 'https:' && baseUrl.startsWith('http:')) {
+    baseUrl = baseUrl.replace('http:', 'https:')
+  }
+  
+  return baseUrl
 }
 
 const API_BASE_URL = getApiBaseUrl()
@@ -21,6 +30,8 @@ const API_BASE_URL = getApiBaseUrl()
 // Debug logging
 console.log('API Base URL:', API_BASE_URL)
 console.log('Current hostname:', window.location.hostname)
+console.log('Current protocol:', window.location.protocol)
+console.log('Environment variable:', import.meta.env.VITE_API_BASE_URL)
 
 export class ApiError extends Error {
   constructor(public status: number, message: string) {
