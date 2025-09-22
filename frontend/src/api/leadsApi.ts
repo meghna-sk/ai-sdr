@@ -68,7 +68,19 @@ async function apiRequest<T>(endpoint: string, options?: RequestInit): Promise<T
       xhr.timeout = 10000 // 10 second timeout
       
       if (options?.body) {
-        xhr.send(options.body)
+        // Handle different body types for XMLHttpRequest
+        if (typeof options.body === 'string') {
+          xhr.send(options.body)
+        } else if (options.body instanceof FormData) {
+          xhr.send(options.body)
+        } else if (options.body instanceof Blob) {
+          xhr.send(options.body)
+        } else if (options.body instanceof ArrayBuffer) {
+          xhr.send(options.body)
+        } else {
+          // For ReadableStream and other types, convert to string
+          xhr.send(String(options.body))
+        }
       } else {
         xhr.send()
       }
