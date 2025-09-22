@@ -18,6 +18,13 @@ export class ApiError extends Error {
 async function apiRequest<T>(endpoint: string, options?: RequestInit): Promise<T> {
   const url = `${API_BASE_URL}${endpoint}`
   
+  // More detailed debug logging
+  console.log('=== API REQUEST DEBUG ===')
+  console.log('API_BASE_URL:', API_BASE_URL)
+  console.log('endpoint:', endpoint)
+  console.log('Full URL:', url)
+  console.log('========================')
+  
   try {
     const response = await fetch(url, {
       headers: {
