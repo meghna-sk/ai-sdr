@@ -16,12 +16,14 @@ from typing import Optional, List
 router = APIRouter(prefix="/api/leads", tags=["leads"])
 
 @router.get("/", response_model=List[LeadSchema])
+@router.get("", response_model=List[LeadSchema])  # Handle both with and without trailing slash
 def get_leads(db: Session = Depends(get_db)):
     """Get all leads"""
     leads = db.query(Lead).all()
     return leads
 
 @router.post("/", response_model=LeadSchema, status_code=status.HTTP_201_CREATED)
+@router.post("", response_model=LeadSchema, status_code=status.HTTP_201_CREATED)  # Handle both with and without trailing slash
 def create_lead(lead: LeadCreate, db: Session = Depends(get_db)):
     """Create a new lead"""
     try:
@@ -66,6 +68,7 @@ def create_lead(lead: LeadCreate, db: Session = Depends(get_db)):
         )
 
 @router.post("/import")
+@router.post("/import/")  # Handle both with and without trailing slash
 def import_leads_csv(
     file: UploadFile = File(...),
     db: Session = Depends(get_db)
@@ -214,6 +217,7 @@ def import_leads_csv(
 
 
 @router.post("/seed")
+@router.post("/seed/")  # Handle both with and without trailing slash
 def seed_leads(db: Session = Depends(get_db)):
     """Seed the database with sample leads for development."""
     try:
