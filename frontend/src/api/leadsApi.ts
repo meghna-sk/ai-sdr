@@ -1,7 +1,7 @@
 import { Lead, ActivitiesResponse } from '../types'
 
-// Force HTTPS URL construction
-const API_BASE_URL = 'https://ai-sdr-k9ml.onrender.com'
+// Use environment variable with fallback
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://ai-sdr-k9ml.onrender.com'
 
 export class ApiError extends Error {
   constructor(public status: number, message: string) {
@@ -11,28 +11,10 @@ export class ApiError extends Error {
 }
 
 async function apiRequest<T>(endpoint: string, options?: RequestInit): Promise<T> {
-  // Try using a different URL construction method
-  const baseUrl = 'https://ai-sdr-k9ml.onrender.com'
-  const fullUrl = baseUrl + endpoint
-
-  // Force HTTPS and log everything
-  console.log('=== NETWORK DEBUG ===')
-  console.log('Base URL:', baseUrl)
-  console.log('Endpoint:', endpoint)
-  console.log('Full URL:', fullUrl)
-  console.log('URL protocol:', new URL(fullUrl).protocol)
-  console.log('URL hostname:', new URL(fullUrl).hostname)
-  console.log('URL pathname:', new URL(fullUrl).pathname)
-  console.log('Service Worker active:', navigator.serviceWorker?.controller ? 'YES' : 'NO')
-  console.log('User Agent:', navigator.userAgent)
-  console.log('Location:', window.location.href)
-  console.log('========================')
+  const url = `${API_BASE_URL}${endpoint}`
 
   try {
-    console.log('Attempting fetch with reconstructed URL:', fullUrl)
-    
-    // Try fetch first with explicit HTTPS enforcement
-    const response = await fetch(fullUrl, {
+    const response = await fetch(url, {
       headers: {
         'Content-Type': 'application/json',
         ...options?.headers,
@@ -49,7 +31,6 @@ async function apiRequest<T>(endpoint: string, options?: RequestInit): Promise<T
     if (error instanceof ApiError) {
       throw error
     }
-    // Network or other errors
     throw new ApiError(0, error instanceof Error ? error.message : 'Unknown error')
   }
 }
@@ -57,12 +38,12 @@ async function apiRequest<T>(endpoint: string, options?: RequestInit): Promise<T
 export const leadsApi = {
   // Get all leads
   async getLeads(): Promise<Lead[]> {
-    return apiRequest<Lead[]>('/api/leads/')
+    return apiRequest<Lead[]>('/api/leads')
   },
 
   // Create a new lead
   async createLead(lead: Omit<Lead, 'id' | 'created_at' | 'updated_at' | 'score' | 'company_profile_id'>): Promise<Lead> {
-    return apiRequest<Lead>('/api/leads/', {
+    return apiRequest<Lead>('/api/leads', {
       method: 'POST',
       body: JSON.stringify(lead),
     })
@@ -70,7 +51,7 @@ export const leadsApi = {
 
   // Update a lead
   async updateLead(id: number, updates: Partial<Lead>): Promise<Lead> {
-    return apiRequest<Lead>(`/api/leads/${id}/`, {
+    return apiRequest<Lead>(`/api/leads/${id}`, {
       method: 'PUT',
       body: JSON.stringify(updates),
     })
@@ -78,7 +59,7 @@ export const leadsApi = {
 
   // Delete a lead
   async deleteLead(id: number): Promise<void> {
-    await apiRequest<void>(`/api/leads/${id}/`, {
+    await apiRequest<void>(`/api/leads/${id}`, {
       method: 'DELETE',
     })
   },
@@ -88,7 +69,7 @@ export const leadsApi = {
     const formData = new FormData()
     formData.append('file', file)
 
-    return apiRequest<{ message: string; imported_count: number; failed_count: number }>('/api/leads/import/', {
+    return apiRequest<{ message: string; imported_count: number; failed_count: number }>('/api/leads/import', {
       method: 'POST',
       body: formData,
       headers: {}, // Let browser set Content-Type for FormData
@@ -97,7 +78,7 @@ export const leadsApi = {
 
   // Seed database with sample leads
   async seedLeads(): Promise<{ message: string; total_leads: number }> {
-    return apiRequest<{ message: string; total_leads: number }>('/api/leads/seed/', {
+    return apiRequest<{ message: string; total_leads: number }>('/api/leads/seed', {
       method: 'POST',
     })
   },
@@ -107,7 +88,7 @@ export const leadsApi = {
     limit?: number
     offset?: number
   }): Promise<ActivitiesResponse> {
-    const url = new URL(`${API_BASE_URL}/api/leads/${leadId}/activities/`)
+    const url = new URL(`${API_BASE_URL}/api/leads/${leadId}/activities`)
     
     if (params?.type) {
       url.searchParams.append('type', params.type)

@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { MeetingSlotsRequest, MeetingSlotsResponse, ICSRequest } from '../types'
 
-const API_BASE_URL = 'https://ai-sdr-k9ml.onrender.com'
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://ai-sdr-k9ml.onrender.com'
 
 // Hook for meeting slots
 export const useMeetingSlots = () => {

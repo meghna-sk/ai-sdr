@@ -31,13 +31,10 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=[
         "http://localhost:5173",  # Vite dev server
-        "https://ai-sdr-frontend-acds.onrender.com",  # Render frontend HTTPS
-        "http://ai-sdr-frontend-acds.onrender.com",  # Render frontend HTTP (in case of redirects)
-        "https://ai-sdr-k9ml.onrender.com",  # Alternative frontend URL HTTPS
-        "http://ai-sdr-k9ml.onrender.com",  # Alternative frontend URL HTTP (in case of redirects)
+        "https://ai-sdr-frontend-acds.onrender.com",  # Render frontend
     ],
     allow_credentials=True,
-    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allow_methods=["*"],
     allow_headers=["*"],
 )
 
