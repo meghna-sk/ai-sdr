@@ -1,6 +1,5 @@
 import { Lead, ActivitiesResponse } from '../types'
 
-// Use environment variable with fallback
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://ai-sdr-k9ml.onrender.com'
 
 export class ApiError extends Error {
@@ -12,7 +11,7 @@ export class ApiError extends Error {
 
 async function apiRequest<T>(endpoint: string, options?: RequestInit): Promise<T> {
   const url = `${API_BASE_URL}${endpoint}`
-
+  
   try {
     const response = await fetch(url, {
       headers: {
@@ -31,6 +30,7 @@ async function apiRequest<T>(endpoint: string, options?: RequestInit): Promise<T
     if (error instanceof ApiError) {
       throw error
     }
+    // Network or other errors
     throw new ApiError(0, error instanceof Error ? error.message : 'Unknown error')
   }
 }

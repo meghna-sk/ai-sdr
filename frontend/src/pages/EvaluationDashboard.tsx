@@ -29,6 +29,7 @@ const EvaluationDashboard: React.FC = () => {
     runEvaluation({})
   }
 
+  console.log('HERE')
   
   const getStatusIcon = (status: string) => {
     switch (status) {

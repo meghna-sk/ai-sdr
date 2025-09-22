@@ -186,7 +186,7 @@ const LeadsPage: React.FC = () => {
           </p>
         </div>
         <div className="mt-4 sm:mt-0 sm:flex sm:space-x-3">
-          {(leads.length === 0 && !loading) && (
+          {leads.length === 0 && !loading && !error && (
             <button
               type="button"
               onClick={handleSeedLeads}

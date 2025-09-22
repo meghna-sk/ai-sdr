@@ -30,20 +30,17 @@ app.include_router(meetings.router)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
-        "http://localhost:5173",  # Vite dev server
-        "https://ai-sdr-frontend-acds.onrender.com",  # Render frontend
+        "http://localhost:3000", 
+        "http://localhost:5173",
+        "https://ai-sdr-frontend-acds.onrender.com",
+        "https://ai-sdr-k9ml.onrender.com"
     ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-@app.get("/healthz")
-async def health_check():
-    """Health check endpoint"""
-    return {"status": "healthy", "service": "grok-sdr-api"}
-
 @app.get("/")
 async def root():
     """Root endpoint"""
-    return {"message": "Grok SDR API", "version": "1.0.0"}
+    return {"message": "AI SDR API", "version": "1.0.0"}

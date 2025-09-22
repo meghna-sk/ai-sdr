@@ -36,7 +36,7 @@ interface RunEvaluationRequest {
   include_leads?: string[]
 }
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://ai-sdr-k9ml.onrender.com'
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000'
 
 // Fetch all evaluations
 const fetchEvaluations = async (): Promise<EvaluationRun[]> => {
