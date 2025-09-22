@@ -31,82 +31,20 @@ async function apiRequest<T>(endpoint: string, options?: RequestInit): Promise<T
   try {
     console.log('Attempting fetch with reconstructed URL:', fullUrl)
     
-    // Try fetch first
-    try {
-      const response = await fetch(fullUrl, {
-        headers: {
-          'Content-Type': 'application/json',
-          ...options?.headers,
-        },
-        ...options,
-      })
+    // Try fetch first with explicit HTTPS enforcement
+    const response = await fetch(fullUrl, {
+      headers: {
+        'Content-Type': 'application/json',
+        ...options?.headers,
+      },
+      ...options,
+    })
 
-      if (!response.ok) {
-        throw new ApiError(response.status, `HTTP ${response.status}: ${response.statusText}`)
-      }
-
-      return await response.json()
-    } catch (fetchError) {
-      console.log('Fetch failed, trying XMLHttpRequest fallback')
-      
-      // Fallback to XMLHttpRequest
-      return new Promise<T>((resolve, reject) => {
-        const xhr = new XMLHttpRequest()
-        
-        xhr.open(options?.method || 'GET', fullUrl, true)
-        xhr.setRequestHeader('Content-Type', 'application/json')
-        
-        // Set additional headers
-        if (options?.headers) {
-          Object.entries(options.headers).forEach(([key, value]) => {
-            if (typeof value === 'string') {
-              xhr.setRequestHeader(key, value)
-            }
-          })
-        }
-        
-        xhr.onload = () => {
-          if (xhr.status >= 200 && xhr.status < 300) {
-            try {
-              const data = JSON.parse(xhr.responseText)
-              resolve(data)
-            } catch (parseError) {
-              reject(new ApiError(0, 'Invalid JSON response'))
-            }
-          } else {
-            reject(new ApiError(xhr.status, `HTTP ${xhr.status}: ${xhr.statusText}`))
-          }
-        }
-        
-        xhr.onerror = () => {
-          reject(new ApiError(0, 'Network error'))
-        }
-        
-        xhr.ontimeout = () => {
-          reject(new ApiError(0, 'Request timeout'))
-        }
-        
-        xhr.timeout = 10000 // 10 second timeout
-        
-        if (options?.body) {
-          // Handle different body types for XMLHttpRequest
-          if (typeof options.body === 'string') {
-            xhr.send(options.body)
-          } else if (options.body instanceof FormData) {
-            xhr.send(options.body)
-          } else if (options.body instanceof Blob) {
-            xhr.send(options.body)
-          } else if (options.body instanceof ArrayBuffer) {
-            xhr.send(options.body)
-          } else {
-            // For ReadableStream and other types, convert to string
-            xhr.send(String(options.body))
-          }
-        } else {
-          xhr.send()
-        }
-      })
+    if (!response.ok) {
+      throw new ApiError(response.status, `HTTP ${response.status}: ${response.statusText}`)
     }
+
+    return await response.json()
   } catch (error) {
     if (error instanceof ApiError) {
       throw error
