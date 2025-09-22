@@ -13,6 +13,7 @@ export const getApiBaseUrl = () => {
   // Default to localhost for local development
   else {
     baseUrl = 'http://localhost:8000'
+    
   }
   
   // Ensure HTTPS is used in production (fix mixed content issues)

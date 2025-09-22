@@ -10,6 +10,8 @@ export class ApiError extends Error {
 
 async function apiRequest<T>(endpoint: string, options?: RequestInit): Promise<T> {
   const url = `${API_BASE_URL}${endpoint}`
+  console.log('Local base url:', url)
+  console.log('HERE')
   
   try {
     const response = await fetch(url, {
@@ -37,6 +39,7 @@ async function apiRequest<T>(endpoint: string, options?: RequestInit): Promise<T
 export const leadsApi = {
   // Get all leads
   async getLeads(): Promise<Lead[]> {
+    console.log('HERE')
     return apiRequest<Lead[]>('/api/leads')
   },
 
