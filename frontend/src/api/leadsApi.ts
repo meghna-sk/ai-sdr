@@ -1,6 +1,6 @@
 import { Lead, ActivitiesResponse } from '../types'
 
-const API_BASE_URL = 'https://ai-sdr-k9ml.onrender.com'
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://ai-sdr-k9ml.onrender.com'
 
 export class ApiError extends Error {
   constructor(public status: number, message: string) {
@@ -14,9 +14,12 @@ async function apiRequest<T>(endpoint: string, options?: RequestInit): Promise<T
   
   // Force HTTPS and log everything
   console.log('=== NETWORK DEBUG ===')
+  console.log('API_BASE_URL:', API_BASE_URL)
+  console.log('endpoint:', endpoint)
   console.log('Original URL:', url)
   console.log('URL protocol:', new URL(url).protocol)
   console.log('URL hostname:', new URL(url).hostname)
+  console.log('URL pathname:', new URL(url).pathname)
   console.log('Service Worker active:', navigator.serviceWorker?.controller ? 'YES' : 'NO')
   console.log('========================')
   
