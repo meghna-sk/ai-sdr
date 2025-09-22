@@ -1,6 +1,26 @@
 import { Lead, ActivitiesResponse } from '../types'
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://ai-sdr-k9ml.onrender.com'
+// Determine API base URL based on environment
+const getApiBaseUrl = () => {
+  // First priority: Check for environment variable (this should work in Render)
+  if (import.meta.env.VITE_API_BASE_URL) {
+    return import.meta.env.VITE_API_BASE_URL
+  }
+  
+  // Fallback: Check if we're in production (deployed on Render)
+  if (window.location.hostname.includes('onrender.com')) {
+    return 'https://ai-sdr-k9ml.onrender.com'
+  }
+  
+  // Default to localhost for local development
+  return 'http://localhost:8000'
+}
+
+const API_BASE_URL = getApiBaseUrl()
+
+// Debug logging
+console.log('API Base URL:', API_BASE_URL)
+console.log('Current hostname:', window.location.hostname)
 
 export class ApiError extends Error {
   constructor(public status: number, message: string) {
